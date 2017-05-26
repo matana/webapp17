@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.lucene.classification.KNearestNeighborClassifier;
 import org.apache.lucene.classification.SimpleNaiveBayesClassifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,12 @@ public class IRConfig {
 	
 	private static final String indexDir = "luceneIndex";
 	private static final String textDir = "texte/";
-
+	
+	/**
+	 * filterQuery is used to filter training documents
+	 */
+	private static final String filterQuery = "spiegel";
+	
 	@Bean
 	public Searcher searcher() throws IOException {
 		Indexer indexer = new Indexer(indexDir);
@@ -36,10 +42,17 @@ public class IRConfig {
 		return new NewsCorpus(textDir);
 	}
 
-	@Bean(name = "spiegelClassifier")
-	public TextClassifier classifier() throws IOException {
+	@Bean(name = "nb")
+	public TextClassifier naiveBayesClassifier() throws IOException {
 		Set<IRDocument> trainingSet = new HashSet<IRDocument>(corpus().getDocuments());
-		ClassifierStrategy classifier = new LuceneAdapter(new SimpleNaiveBayesClassifier(), indexDir, "spiegel");
+		ClassifierStrategy classifier = new LuceneAdapter(new SimpleNaiveBayesClassifier(), indexDir, filterQuery);
+		return new TextClassifier(classifier, trainingSet);
+	}
+	
+	@Bean(name = "knn")
+	public TextClassifier kNearestNeighborClassifier() throws IOException {
+		Set<IRDocument> trainingSet = new HashSet<IRDocument>(corpus().getDocuments());
+		ClassifierStrategy classifier = new LuceneAdapter(new KNearestNeighborClassifier(1), indexDir, filterQuery);
 		return new TextClassifier(classifier, trainingSet);
 	}
 
