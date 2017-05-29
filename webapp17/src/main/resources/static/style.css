@@ -1,0 +1,7 @@
+@CHARSET "UTF-8";
+
+.welcomeMessage {
+	font-size: 2em;
+	color: #300384;
+	letter-spacing: 3px;
+}
