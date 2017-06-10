@@ -8,6 +8,7 @@ import org.apache.lucene.classification.KNearestNeighborClassifier;
 import org.apache.lucene.classification.SimpleNaiveBayesClassifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 import de.uni_koeln.spinfo.textengineering.ir.classifier.ClassifierStrategy;
 import de.uni_koeln.spinfo.textengineering.ir.classifier.LuceneAdapter;
@@ -43,6 +44,7 @@ public class IRConfig {
 	}
 
 	@Bean(name = "nb")
+	@DependsOn(value = "searcher")
 	public TextClassifier naiveBayesClassifier() throws IOException {
 		Set<IRDocument> trainingSet = new HashSet<IRDocument>(corpus().getDocuments());
 		ClassifierStrategy classifier = new LuceneAdapter(new SimpleNaiveBayesClassifier(), indexDir, filterQuery);
@@ -50,6 +52,7 @@ public class IRConfig {
 	}
 	
 	@Bean(name = "knn")
+	@DependsOn(value = "searcher")
 	public TextClassifier kNearestNeighborClassifier() throws IOException {
 		Set<IRDocument> trainingSet = new HashSet<IRDocument>(corpus().getDocuments());
 		ClassifierStrategy classifier = new LuceneAdapter(new KNearestNeighborClassifier(1), indexDir, filterQuery);
